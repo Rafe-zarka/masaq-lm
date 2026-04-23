@@ -44,7 +44,7 @@ class AiContentService
             'content-type'      => 'application/json',
         ])->withOptions(['verify' => ! app()->isLocal()])->timeout(60)->post($this->apiUrl, [
             'model'      => $this->model,
-            'max_tokens' => 1024,
+            'max_tokens' => 2048,
             'messages'   => [
                 ['role' => 'user', 'content' => $prompt],
             ],
@@ -58,13 +58,21 @@ class AiContentService
         }
 
         $raw = $response->json('content.0.text', '');
+
+        // Strip markdown code fences
         $clean = preg_replace('/```json\s*/i', '', $raw);
         $clean = preg_replace('/```\s*/', '', $clean);
         $clean = trim($clean);
 
+        // Extract the outermost JSON object in case there is surrounding text
+        if (preg_match('/\{.*\}/s', $clean, $matches)) {
+            $clean = $matches[0];
+        }
+
         $decoded = json_decode($clean, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
+            logger()->error('masaq-ai: JSON parse failed', ['raw' => substr($raw, 0, 500)]);
             throw new \RuntimeException('Failed to parse AI response as JSON.');
         }
 
