@@ -12,7 +12,9 @@ class AiContentService
 
     public function __construct()
     {
-        $this->apiKey = config('services.anthropic.key', '');
+        // config() may return empty if config:cache ran before env vars were injected
+        // env() reads the live system environment and works correctly on Laravel Cloud
+        $this->apiKey = config('services.anthropic.key') ?: env('ANTHROPIC_API_KEY', '');
     }
 
     public function fallbackMock(string $mode): array
