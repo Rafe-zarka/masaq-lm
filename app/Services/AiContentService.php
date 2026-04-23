@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 class AiContentService
 {
     private string $apiKey;
-    private string $model = 'claude-sonnet-4-6';
+    private string $model = 'claude-haiku-4-5-20251001';
     private string $apiUrl = 'https://api.anthropic.com/v1/messages';
 
     public function __construct()
