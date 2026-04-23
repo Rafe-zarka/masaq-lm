@@ -24,7 +24,10 @@ class AiContentService
 
     public function generate(string $content, string $mode, string $tone): array
     {
+        logger()->info('masaq-ai: key_length=' . strlen($this->apiKey) . ' mode=' . $mode);
+
         if (empty($this->apiKey)) {
+            logger()->warning('masaq-ai: API key is empty — returning mock');
             return $this->mock($mode);
         }
 
@@ -47,7 +50,10 @@ class AiContentService
             ],
         ]);
 
+        logger()->info('masaq-ai: http_status=' . $response->status());
+
         if (! $response->successful()) {
+            logger()->error('masaq-ai: API error — ' . $response->body());
             throw new \RuntimeException('Anthropic API error: ' . $response->body());
         }
 
