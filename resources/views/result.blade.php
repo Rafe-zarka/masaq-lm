@@ -107,15 +107,41 @@
                   @endforeach
                 </ul>
               </div>
-              {{-- Visual hint --}}
-              @if(!empty($slide['visual']))
-                <div style="width:160px;background:var(--surface2);border-left:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px;gap:8px;">
-                  <div style="width:42px;height:42px;border-radius:10px;background:var(--border);display:flex;align-items:center;justify-content:center;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.5">
-                      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
-                    </svg>
+              {{-- Visual hint panel --}}
+              @if(!empty($slide['visual']) || !empty($slide['image_prompt']))
+                @php
+                  $visualText = $slide['visual'] ?? $slide['image_prompt'] ?? '';
+                  $vl = strtolower($visualText);
+                  if (str_contains($vl, 'shield') || str_contains($vl, 'protect') || str_contains($vl, 'secur') || str_contains($vl, 'cyber')) {
+                      $icon = '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>';
+                  } elseif (str_contains($vl, 'lock') || str_contains($vl, 'encrypt') || str_contains($vl, 'password') || str_contains($vl, 'credential')) {
+                      $icon = '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>';
+                  } elseif (str_contains($vl, 'warning') || str_contains($vl, 'threat') || str_contains($vl, 'attack') || str_contains($vl, 'alert') || str_contains($vl, 'danger')) {
+                      $icon = '<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>';
+                  } elseif (str_contains($vl, 'network') || str_contains($vl, 'connect') || str_contains($vl, 'digital') || str_contains($vl, 'internet') || str_contains($vl, 'cloud')) {
+                      $icon = '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>';
+                  } elseif (str_contains($vl, 'data') || str_contains($vl, 'database') || str_contains($vl, 'storage') || str_contains($vl, 'server')) {
+                      $icon = '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>';
+                  } elseif (str_contains($vl, 'chart') || str_contains($vl, 'graph') || str_contains($vl, 'growth') || str_contains($vl, 'trend') || str_contains($vl, 'statistic')) {
+                      $icon = '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>';
+                  } elseif (str_contains($vl, 'people') || str_contains($vl, 'team') || str_contains($vl, 'user') || str_contains($vl, 'employ') || str_contains($vl, 'human') || str_contains($vl, 'staff')) {
+                      $icon = '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>';
+                  } elseif (str_contains($vl, 'checklist') || str_contains($vl, 'step') || str_contains($vl, 'process') || str_contains($vl, 'plan') || str_contains($vl, 'strategy')) {
+                      $icon = '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>';
+                  } elseif (str_contains($vl, 'money') || str_contains($vl, 'cost') || str_contains($vl, 'financ') || str_contains($vl, 'budget') || str_contains($vl, 'invest')) {
+                      $icon = '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>';
+                  } else {
+                      $icon = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+                  }
+                @endphp
+                <div style="width:200px;background:var(--accent-soft);border-left:1px solid var(--accent-mid);border-radius:0 var(--radius) var(--radius) 0;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;padding:24px 18px;gap:12px;">
+                  <div style="width:44px;height:44px;border-radius:12px;background:var(--accent-mid);display:flex;align-items:center;justify-content:center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $icon !!}</svg>
                   </div>
-                  <p style="font-size:10px;color:var(--text-3);text-align:center;line-height:1.4;font-style:italic;">{{ $slide['visual'] }}</p>
+                  <div>
+                    <p style="font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--accent);font-family:var(--font-head);margin-bottom:6px;text-transform:uppercase;">Visual</p>
+                    <p style="font-size:12px;color:oklch(0.45 0.10 168);line-height:1.55;">{{ $visualText }}</p>
+                  </div>
                 </div>
               @endif
             </div>
@@ -208,5 +234,6 @@ function copyContent() {
     }, 2000);
   });
 }
+
 </script>
 @endpush

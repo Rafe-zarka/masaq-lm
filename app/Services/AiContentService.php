@@ -107,7 +107,8 @@ Return ONLY a valid JSON object with this exact structure:
     {
       "title": "Slide title",
       "bullets": ["Point one", "Point two", "Point three"],
-      "visual": "Brief hint for a visual/image (optional, 1 short sentence)"
+      "visual": "Brief hint for a visual/image (optional, 1 short sentence)",
+      "image_prompt": "Detailed DALL-E image prompt for this slide (1-2 sentences, professional illustration)"
     }
   ]
 }
@@ -118,6 +119,7 @@ Rules:
 - Bullets are concise, actionable, punchy (max 15 words each)
 - Titles are short and clear
 - Visual hints are optional but helpful
+- image_prompt describes a clean professional illustration matching the slide content
 - Return ONLY the JSON, no markdown, no explanation
 PROMPT;
     }
