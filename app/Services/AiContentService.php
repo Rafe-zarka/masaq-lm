@@ -15,11 +15,19 @@ class AiContentService
         $this->apiKey = config('services.anthropic.key', '');
     }
 
+    public function fallbackMock(string $mode): array
+    {
+        return $this->mock($mode);
+    }
+
     public function generate(string $content, string $mode, string $tone): array
     {
         if (empty($this->apiKey)) {
             return $this->mock($mode);
         }
+
+        // Guard against excessively long content
+        $content = $this->trimContent($content);
 
         $prompt = $mode === 'slides'
             ? $this->slidesPrompt($content, $tone)
@@ -29,7 +37,7 @@ class AiContentService
             'x-api-key'         => $this->apiKey,
             'anthropic-version' => '2023-06-01',
             'content-type'      => 'application/json',
-        ])->timeout(60)->post($this->apiUrl, [
+        ])->withOptions(['verify' => ! app()->isLocal()])->timeout(60)->post($this->apiUrl, [
             'model'      => $this->model,
             'max_tokens' => 2048,
             'messages'   => [
@@ -53,6 +61,16 @@ class AiContentService
         }
 
         return $decoded;
+    }
+
+    private function trimContent(string $content, int $maxChars = 6000): string
+    {
+        if (mb_strlen($content) <= $maxChars) {
+            return $content;
+        }
+        $trimmed   = mb_substr($content, 0, $maxChars);
+        $lastSpace = mb_strrpos($trimmed, ' ');
+        return $lastSpace ? mb_substr($trimmed, 0, $lastSpace) : $trimmed;
     }
 
     private function slidesPrompt(string $content, string $tone): string

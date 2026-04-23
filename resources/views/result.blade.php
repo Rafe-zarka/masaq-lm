@@ -17,19 +17,30 @@
         </svg>
         Back
       </a>
-      <div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         @if($result['mode'] === 'slides')
           <span style="font-family:var(--font-head);font-weight:700;font-size:15px;">Your Slides</span>
-          <span style="margin-left:8px;font-size:12px;color:var(--text-3);background:var(--surface2);padding:2px 8px;border-radius:12px;border:1px solid var(--border);">
+          <span style="font-size:12px;color:var(--text-3);background:var(--surface2);padding:2px 8px;border-radius:12px;border:1px solid var(--border);">
             {{ count($result['data']['slides'] ?? []) }} slides
           </span>
         @else
           <span style="font-family:var(--font-head);font-weight:700;font-size:15px;">Video Script</span>
           @if(!empty($result['data']['duration']))
-            <span style="margin-left:8px;font-size:12px;color:var(--text-3);background:var(--surface2);padding:2px 8px;border-radius:12px;border:1px solid var(--border);">
+            <span style="font-size:12px;color:var(--text-3);background:var(--surface2);padding:2px 8px;border-radius:12px;border:1px solid var(--border);">
               ~{{ $result['data']['duration'] }}
             </span>
           @endif
+        @endif
+        {{-- Source badge --}}
+        @if(($result['sourceType'] ?? 'text') === 'pdf')
+          <span style="font-size:11px;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:12px;border:1px solid var(--accent-mid);display:inline-flex;align-items:center;gap:4px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            PDF
+          </span>
+        @else
+          <span style="font-size:11px;color:var(--text-3);background:var(--surface2);padding:2px 8px;border-radius:12px;border:1px solid var(--border);">
+            Text
+          </span>
         @endif
       </div>
     </div>
@@ -47,6 +58,12 @@
 
   {{-- Main content --}}
   <main style="flex:1;padding:40px 32px;max-width:{{ $result['mode'] === 'slides' ? '900px' : '760px' }};margin:0 auto;width:100%;">
+
+    @if(session('warning'))
+    <div style="margin-bottom:20px;padding:12px 16px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:var(--radius-sm);color:#92400E;font-size:13px;">
+      {{ session('warning') }}
+    </div>
+    @endif
 
     @if($result['mode'] === 'slides')
       {{-- ── SLIDES ── --}}
