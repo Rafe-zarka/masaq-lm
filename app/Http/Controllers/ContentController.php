@@ -20,6 +20,9 @@ class ContentController extends Controller
 
     public function generate(Request $request)
     {
+        // AI calls can take 15-30s — override the server's default execution limit
+        set_time_limit(120);
+
         $request->validate([
             'mode' => 'required|in:slides,video',
             'tone' => 'required|in:professional,casual,academic,storytelling',
@@ -71,20 +74,24 @@ class ContentController extends Controller
             return redirect()->route('result');
 
         } catch (\Throwable $e) {
-            // If AI failed but we have content, fall back to mock
+            logger()->error('masaq-lm AI generation failed', [
+                'message'    => $e->getMessage(),
+                'mode'       => $request->input('mode'),
+                'sourceType' => $sourceType ?? 'text',
+            ]);
+
+            // API or parse failure → show mock with warning so the user still sees output
             if (str_contains($e->getMessage(), 'Anthropic API') || str_contains($e->getMessage(), 'parse')) {
-                try {
-                    $data = $this->ai->fallbackMock($request->input('mode'));
-                    session([
-                        'result' => [
-                            'mode'       => $request->input('mode'),
-                            'data'       => $data,
-                            'sourceType' => $sourceType ?? 'text',
-                            'sourceName' => $sourceName ?? null,
-                        ],
-                    ]);
-                    return redirect()->route('result')->with('warning', 'AI generation failed — showing sample output instead.');
-                } catch (\Throwable) {}
+                $data = $this->ai->fallbackMock($request->input('mode'));
+                session([
+                    'result' => [
+                        'mode'       => $request->input('mode'),
+                        'data'       => $data,
+                        'sourceType' => $sourceType ?? 'text',
+                        'sourceName' => $sourceName ?? null,
+                    ],
+                ]);
+                return redirect()->route('result')->with('warning', 'AI generation failed — showing sample output instead.');
             }
 
             return back()

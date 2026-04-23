@@ -39,7 +39,7 @@ class AiContentService
             'content-type'      => 'application/json',
         ])->withOptions(['verify' => ! app()->isLocal()])->timeout(60)->post($this->apiUrl, [
             'model'      => $this->model,
-            'max_tokens' => 2048,
+            'max_tokens' => 1024,
             'messages'   => [
                 ['role' => 'user', 'content' => $prompt],
             ],
